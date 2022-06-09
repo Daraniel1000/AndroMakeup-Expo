@@ -1,0 +1,1210 @@
+diff --git a/node_modules/expo-face-detector/.idea/.gitignore b/node_modules/expo-face-detector/.idea/.gitignore
+new file mode 100644
+index 0000000..26d3352
+--- /dev/null
++++ b/node_modules/expo-face-detector/.idea/.gitignore
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml
+diff --git a/node_modules/expo-face-detector/.idea/expo-face-detector.iml b/node_modules/expo-face-detector/.idea/expo-face-detector.iml
+new file mode 100644
+index 0000000..d6ebd48
+--- /dev/null
++++ b/node_modules/expo-face-detector/.idea/expo-face-detector.iml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="JAVA_MODULE" version="4">
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$" />
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/.idea/modules.xml b/node_modules/expo-face-detector/.idea/modules.xml
+new file mode 100644
+index 0000000..ed79e69
+--- /dev/null
++++ b/node_modules/expo-face-detector/.idea/modules.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/expo-face-detector.iml" filepath="$PROJECT_DIR$/.idea/expo-face-detector.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/.idea/workspace.xml b/node_modules/expo-face-detector/.idea/workspace.xml
+new file mode 100644
+index 0000000..19bc818
+--- /dev/null
++++ b/node_modules/expo-face-detector/.idea/workspace.xml
+@@ -0,0 +1,39 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="NONE" />
++  </component>
++  <component name="ChangeListManager">
++    <list default="true" id="96fa0961-66c0-4f52-9e81-93a17414de8f" name="Default Changelist" comment="" />
++    <option name="SHOW_DIALOG" value="false" />
++    <option name="HIGHLIGHT_CONFLICTS" value="true" />
++    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++    <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="ProjectId" id="2AABDJ1eYtKPJ71p53eBBuSpuw1" />
++  <component name="ProjectViewState">
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++  </component>
++  <component name="PropertiesComponent">
++    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
++    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
++    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
++    <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
++    <property name="cidr.known.project.marker" value="true" />
++    <property name="dart.analysis.tool.window.visible" value="false" />
++    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
++    <property name="show.migrate.to.gradle.popup" value="false" />
++  </component>
++  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
++  <component name="TaskManager">
++    <task active="true" id="Default" summary="Default task">
++      <changelist id="96fa0961-66c0-4f52-9e81-93a17414de8f" name="Default Changelist" comment="" />
++      <created>1654442391102</created>
++      <option name="number" value="Default" />
++      <option name="presentableId" value="Default" />
++      <updated>1654442391102</updated>
++    </task>
++    <servers />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/ExpoFaceDetector.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/ExpoFaceDetector.kt
+index da21073..eb6f62c 100644
+--- a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/ExpoFaceDetector.kt
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/ExpoFaceDetector.kt
+@@ -25,7 +25,15 @@ import expo.modules.interfaces.facedetector.FaceDetectionUnspecifiedError
+ import java.io.IOException
+ import java.util.ArrayList
+ 
++import expo.modules.camera.GraphicOverlay
++import expo.modules.camera.CameraImageGraphic
++import expo.modules.camera.FastGraphic
++import java.io.ByteArrayOutputStream
++import android.graphics.*
++import android.widget.Toast
++
+ private const val DETECT_LANDMARKS_KEY = "detectLandmarks"
++private const val DETECT_CONTOURS_KEY = "detectContours"
+ private const val MIN_INTERVAL_MILLIS_KEY = "minDetectionInterval"
+ private const val MODE_KEY = "mode"
+ private const val RUN_CLASSIFICATIONS_KEY = "runClassifications"
+@@ -50,6 +58,13 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+         field = value
+       }
+     }
++  private var contourType = NO_CONTOURS
++    set(value) {
++      if (field != value) {
++        release()
++        field = value
++      }
++    }
+   private var classificationType = NO_CLASSIFICATIONS
+     set(value) {
+       if (field != value) {
+@@ -68,14 +83,44 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+   // Public API
+   @Throws(IOException::class)
+   override fun detectFaces(filePath: Uri, complete: FacesDetectionCompleted, error: FaceDetectionError) {
+-    if (faceDetector == null) {
+-      createFaceDetector()
+-    }
+-    val image = InputImage.fromFilePath(context, filePath)
+-    faceDetector?.process(image)
+-      ?.addOnCompleteListener(
+-        faceDetectionHandler(FaceDetectorUtils::serializeFace, complete, error)
+-      )
++    // if (faceDetector == null) {
++    //   createFaceDetector()
++    // }
++    // val image = InputImage.fromFilePath(context, filePath)
++    // faceDetector?.process(image)
++    //   ?.addOnCompleteListener(
++    //     faceDetectionHandler(FaceDetectorUtils::serializeFace, complete, error)
++    //   )
++  }
++
++  private fun getBitmapFromByteArray(imageData: ByteArray, width: Int, height: Int, rotation: Int): Bitmap? {    
++    var image = YuvImage(
++      imageData, ImageFormat.NV21, width, height, null
++    )
++    var stream = ByteArrayOutputStream()
++    image.compressToJpeg(Rect(0, 0, width, height), 80, stream)
++
++    var bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size())
++
++    stream.close()
++    return rotateBitmap(bmp, rotation, false, false)
++  }
++
++  /** Rotates a bitmap if it is converted from a bytebuffer.  */
++  private fun rotateBitmap(
++      bitmap: Bitmap, rotationDegrees: Int, flipX: Boolean, flipY: Boolean
++  ): Bitmap? {
++      val matrix = Matrix()
++      // Rotate the image back to straight.
++      matrix.postRotate(rotationDegrees.toFloat())
++      // Mirror the image along the X or Y axis.
++      matrix.postScale(if (flipX) -1.0f else 1.0f, if (flipY) -1.0f else 1.0f)
++      val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
++      // Recycle the old bitmap if it has changed.
++      if (rotatedBitmap != bitmap) {
++          bitmap.recycle()
++      }
++      return rotatedBitmap
+   }
+ 
+   override fun detectFaces(
+@@ -88,7 +133,13 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+     scaleY: Double,
+     complete: FacesDetectionCompleted,
+     error: FaceDetectionError,
+-    skipped: FaceDetectionSkipped
++    skipped: FaceDetectionSkipped,
++    overlay: GraphicOverlay?,
++    lipsPaint: Paint?, 
++    lipsPaintOver: Paint?, 
++    eyeshadowPaint: Paint?, 
++    dummyShadow: Path?, 
++    shadowColors: IntArray?
+   ) {
+     if (faceDetector == null) {
+       createFaceDetector()
+@@ -100,15 +151,39 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+         ?.addOnCompleteListener(
+           faceDetectionHandler(
+             { face ->
+-              var result = serializeFace(face, scaleX, scaleY)
+-              if (mirrored) {
+-                result = if (rotation == 270 || rotation == 90) {
+-                  rotateFaceX(result, height, scaleX)
+-                } else {
+-                  rotateFaceX(result, width, scaleX)
++              val bmp: Bitmap? = getBitmapFromByteArray(imageData, width, height, rotation)
++              if(overlay != null) {
++                overlay.clear()
++                overlay.setImageSourceInfo(width, height, true)      
++        
++                if(bmp != null){
++                  overlay.add(CameraImageGraphic(overlay, bmp))
++                  if(face != null){
++                    val shader = BitmapShader(bmp!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
++                    overlay.add(FastGraphic(overlay!!, face, lipsPaint!!, lipsPaintOver!!, eyeshadowPaint!!, dummyShadow!!, shadowColors!!, shader))
++                  }
+                 }
+               }
+-              result
++              // var sizeX = width;
++              // if (mirrored && (rotation == 270 || rotation == 90)) {
++              //     sizeX = height
++              //   } 
++              // var result = serializeFace(face, mirrored, sizeX, scaleX, scaleY)
++              // if (mirrored) {
++              //   result = if (rotation == 270 || rotation == 90) {
++              //     rotateFaceX(result, height, scaleX)
++              //   } else {
++              //     rotateFaceX(result, width, scaleX)
++              //   }
++              // }
++              // result
++                Bundle().apply {
++                  if(face != null) {
++                    putInt("face", 1)
++                  } else {
++                    putInt("face", 0)
++                  }
++                }
+             },
+             complete, error
+           )
+@@ -118,15 +193,16 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+     }
+   }
+ 
+-  private fun faceDetectionHandler(transformer: Function<Face, Bundle>, complete: FacesDetectionCompleted, error: FaceDetectionError): OnCompleteListener<List<Face>?> =
++  private fun faceDetectionHandler(transformer: Function<Face?, Bundle>, complete: FacesDetectionCompleted, error: FaceDetectionError): OnCompleteListener<List<Face>?> =
+     OnCompleteListener { task: Task<List<Face>?> ->
+       if (task.isComplete && task.isSuccessful) {
+         val facesArray = ArrayList<Bundle>().apply {
+           val faces = task.result
+-          faces?.forEach { face -> add(transformer.apply(face)) }
++          add(transformer.apply(faces?.firstOrNull()))
+         }
+         complete.detectionCompleted(facesArray)
+       } else {
++        Toast.makeText(context, "face detection error", Toast.LENGTH_SHORT).show()
+         error.onError(FaceDetectionUnspecifiedError())
+       }
+     }
+@@ -140,6 +216,9 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+     if (settings[DETECT_LANDMARKS_KEY] is Number) {
+       landmarkType = (settings[DETECT_LANDMARKS_KEY] as Number).toInt()
+     }
++    if (settings[DETECT_CONTOURS_KEY] is Number) {
++      landmarkType = (settings[DETECT_CONTOURS_KEY] as Number).toInt()
++    }
+     if (settings[TRACKING_KEY] is Boolean) {
+       tracking = (settings[TRACKING_KEY] as Boolean)
+     }
+@@ -172,6 +251,7 @@ class ExpoFaceDetector(private val context: Context) : FaceDetectorInterface {
+       .setLandmarkMode(landmarkType)
+       .setPerformanceMode(mode)
+       .setMinFaceSize(minFaceSize)
++      .setContourMode(2)
+     if (tracking) {
+       builder.enableTracking()
+     }
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorConstants.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorConstants.kt
+index 4b41c58..6c84fe4 100644
+--- a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorConstants.kt
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorConstants.kt
+@@ -6,6 +6,8 @@ const val ALL_CLASSIFICATIONS = FaceDetectorOptions.CLASSIFICATION_MODE_ALL
+ const val NO_CLASSIFICATIONS = FaceDetectorOptions.CLASSIFICATION_MODE_NONE
+ const val ALL_LANDMARKS = FaceDetectorOptions.LANDMARK_MODE_ALL
+ const val NO_LANDMARKS = FaceDetectorOptions.LANDMARK_MODE_NONE
++const val ALL_CONTOURS = FaceDetectorOptions.CONTOUR_MODE_ALL
++const val NO_CONTOURS = FaceDetectorOptions.CONTOUR_MODE_NONE
+ const val ACCURATE_MODE = FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE
+ const val FAST_MODE = FaceDetectorOptions.PERFORMANCE_MODE_FAST
+ 
+@@ -23,3 +25,8 @@ val faceDetectionLandmarksConstants = mapOf(
+   "all" to ALL_LANDMARKS,
+   "none" to NO_LANDMARKS
+ )
++
++val faceDetectionContoursConstants = mapOf(
++  "all" to ALL_CONTOURS,
++  "none" to NO_CONTOURS
++)
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorModule.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorModule.kt
+index 6b5ca67..c6d6344 100644
+--- a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorModule.kt
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorModule.kt
+@@ -18,6 +18,7 @@ import java.util.*
+ private const val TAG = "ExpoFaceDetector"
+ private const val MODE_OPTION_KEY = "Mode"
+ private const val DETECT_LANDMARKS_OPTION_KEY = "Landmarks"
++private const val DETECT_CONTOURS_OPTION_KEY = "Contours"
+ private const val RUN_CLASSIFICATIONS_OPTION_KEY = "Classifications"
+ 
+ class FaceDetectorModule(
+@@ -30,6 +31,7 @@ class FaceDetectorModule(
+   override fun getConstants() = mapOf(
+     MODE_OPTION_KEY to faceDetectionModeConstants,
+     DETECT_LANDMARKS_OPTION_KEY to faceDetectionLandmarksConstants,
++    DETECT_CONTOURS_OPTION_KEY to faceDetectionContoursConstants,
+     RUN_CLASSIFICATIONS_OPTION_KEY to faceDetectionClassificationsConstants
+   )
+ 
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorUtils.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorUtils.kt
+index 053164f..cfb8a60 100644
+--- a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorUtils.kt
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/FaceDetectorUtils.kt
+@@ -4,39 +4,19 @@ import android.graphics.PointF
+ import android.os.Bundle
+ import com.google.mlkit.vision.face.Face
+ import com.google.mlkit.vision.face.FaceLandmark
++import com.google.mlkit.vision.face.FaceContour
+ 
+ object FaceDetectorUtils {
+   @JvmStatic
+   @JvmOverloads
+-  fun serializeFace(face: Face, scaleX: Double = 1.0, scaleY: Double = 1.0): Bundle {
++  fun serializeFace(face: Face, mirrored: Boolean = false, sizeX: Int = 0, scaleX: Double = 1.0, scaleY: Double = 1.0): Bundle {
+     val encodedFace = Bundle().apply {
+-      face.trackingId?.let { putInt("faceID", it) }
++      face.trackingId?.let { putInt("faceID", 7) }
+       putDouble("rollAngle", face.headEulerAngleZ.toDouble())
+       putDouble("yawAngle", face.headEulerAngleY.toDouble())
+ 
+-      face.smilingProbability?.let {
+-        if (it >= 0) {
+-          putDouble("smilingProbability", it.toDouble())
+-        }
+-      }
+-      face.leftEyeOpenProbability?.let {
+-        if (it >= 0) {
+-          putDouble("leftEyeOpenProbability", it.toDouble())
+-        }
+-      }
+ 
+-      face.rightEyeOpenProbability?.let {
+-        if (it >= 0) {
+-          putDouble("rightEyeOpenProbability", it.toDouble())
+-        }
+-      }
+-
+-      LandmarkId.values()
+-        .forEach { id ->
+-          face.getLandmark(id.id)?.let { faceLandmark ->
+-            putBundle(id.name, mapFromPoint(faceLandmark.position, scaleX, scaleY))
+-          }
+-        }
++      putBundle("contours", mapFromContours(face, scaleX, scaleY, mirrored, sizeX))
+ 
+       val box = face.boundingBox
+       val origin = Bundle(2).apply {
+@@ -69,17 +49,23 @@ object FaceDetectorUtils {
+       putBundle("origin", translatedMirroredOrigin)
+     }
+     face.apply {
+-      LandmarkId.values().forEach { id ->
+-        face.getBundle(id.name)?.let { landmark ->
+-          val mirroredPosition = positionMirroredHorizontally(landmark, sourceWidth, scaleX)
+-          putBundle(id.name, mirroredPosition)
+-        }
+-      }
+       putBundle("bounds", newBounds)
+     }
+     return mirrorYawAngle(mirrorRollAngle(face))
+   }
+ 
++  private fun mirrorContour(contour: Bundle, sourceWidth: Int, scaleX: Double) = Bundle().apply {
++    val size = contour.getInt("size")
++    var shape = ""
++    for (i in 0..size - 1) {
++      val mirroredPosition = positionMirroredHorizontally(contour.getBundle(i.toString()), sourceWidth, scaleX)
++      shape += mirroredPosition.getDouble("x").toString() + ',' + mirroredPosition.getDouble("y").toString() + " "
++      putBundle(i.toString(), mirroredPosition)
++    }
++    putInt("size", size)
++    putString("shape", shape)
++  }
++
+   private fun mirrorRollAngle(face: Bundle) = face.apply {
+     putDouble("rollAngle", (-face.getDouble("rollAngle") + 360) % 360)
+   }
+@@ -93,6 +79,42 @@ object FaceDetectorUtils {
+     putDouble("y", point.y * scaleY)
+   }
+ 
++  private fun mapFromArrayList(contour: FaceContour, scaleX: Double, scaleY: Double, mirrored: Boolean, sizeX: Int): String {
++    var ret = ""
++    var points = contour.getPoints()
++    val type = contour.getFaceContourType()
++    if( type == FaceContour.UPPER_LIP_BOTTOM || type == FaceContour.LOWER_LIP_BOTTOM ) {
++      points = points.asReversed()
++    }
++    points.forEach { it ->
++      if(mirrored) {
++        ret += ((sizeX - it.x) * scaleX).toString()
++      } else {
++        ret += (it.x * scaleX).toString()
++      }
++      ret += "," + (it.y * scaleY).toString() + " "
++    }
++    return ret
++  }
++
++  private fun mapFromLandmarks(face: Face, scaleX: Double, scaleY: Double) = Bundle().apply {
++    LandmarkId.values()
++      .forEach { id ->
++        face.getLandmark(id.id)?.let { faceLandmark ->
++          putBundle(id.landmarkName, mapFromPoint(faceLandmark.position, scaleX, scaleY))
++        }
++      }
++  }
++
++  private fun mapFromContours(face: Face, scaleX: Double, scaleY: Double, mirrored: Boolean, sizeX: Int) = Bundle().apply {
++    ContourId.values()
++      .forEach { id ->
++        face.getContour(id.id)?.let { faceContour ->
++          putString(id.contourName, mapFromArrayList(faceContour, scaleX, scaleY, mirrored, sizeX))
++        }
++      }
++  }
++
+   private fun positionTranslatedHorizontally(position: Bundle, translateX: Double) =
+     Bundle(position).apply {
+       putDouble("x", position.getDouble("x") + translateX)
+@@ -103,6 +125,7 @@ object FaceDetectorUtils {
+       putDouble("x", valueMirroredHorizontally(position!!.getDouble("x"), containerWidth, scaleX))
+     }
+ 
++
+   private fun valueMirroredHorizontally(elementX: Double, containerWidth: Int, scaleX: Double) =
+     -elementX + containerWidth * scaleX
+ 
+@@ -120,4 +143,13 @@ object FaceDetectorUtils {
+     RIGHT_EAR(FaceLandmark.RIGHT_EAR, "rightEarPosition"),
+     NOSE_BASE(FaceLandmark.NOSE_BASE, "noseBasePosition");
+   }
++
++  private enum class ContourId(val id: Int, val contourName: String) {
++    BOTTOM_LOWER_LIP(FaceContour.LOWER_LIP_BOTTOM, "lowerLipBottom"),
++    TOP_LOWER_LIP(FaceContour.LOWER_LIP_TOP, "lowerLipTop"),
++    BOTTOM_UPPER_LIP(FaceContour.UPPER_LIP_BOTTOM, "upperLipBottom"),
++    TOP_UPPER_LIP(FaceContour.UPPER_LIP_TOP, "upperLipTop"),
++    LEFT_EYE(FaceContour.LEFT_EYE, "leftEye"),
++    RIGHT_EYE(FaceContour.RIGHT_EYE, "rightEye");
++  }
+ }
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/BezierSpline.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/BezierSpline.kt
+new file mode 100644
+index 0000000..839c6ad
+--- /dev/null
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/BezierSpline.kt
+@@ -0,0 +1,235 @@
++package expo.modules.camera
++
++import android.graphics.Path
++
++/**
++ * Smooth Bézier Spline Through Prescribed Points.
++ *
++ * @see [Bezier Splines](https://www.particleincell.com/2012/bezier-splines)
++ */
++class BezierSpline(knots: Int) {
++    private val mKnots: Int
++    private val mX: FloatArray
++    private val mY: FloatArray
++    private val mPX1: FloatArray
++    private val mPY1: FloatArray
++    private val mPX2: FloatArray
++    private val mPY2: FloatArray
++    private var mResolved = false
++    private var mResolver: ControlPointsResolver? = null
++    private var cur: Int
++
++    /**
++     * Gets knots count.
++     */
++    fun knots(): Int {
++        return mKnots
++    }
++
++    /**
++     * Gets segments count.
++     */
++    fun segments(): Int {
++        return mKnots - 1
++    }
++
++    /**
++     * Sets coordinates of knot.
++     */
++    operator fun set(knot: Int, x: Float, y: Float) {
++        mX[knot] = x
++        mY[knot] = y
++        mResolved = false
++    }
++
++    /**
++     * Sets coordinates of current knot.
++     */
++    operator fun set(x: Float, y: Float) {
++        mX[cur] = x
++        mY[cur++] = y
++        mResolved = false
++    }
++
++    /**
++     * Sets x coordinate of knot.
++     */
++    fun x(knot: Int, x: Float) {
++        mX[knot] = x
++        mResolved = false
++    }
++
++    /**
++     * Sets y coordinate of knot.
++     */
++    fun y(knot: Int, y: Float) {
++        mY[knot] = y
++        mResolved = false
++    }
++
++    /**
++     * Gets x coordinate of knot.
++     */
++    fun x(knot: Int): Float {
++        return mX[knot]
++    }
++
++    /**
++     * Gets y coordinate of knot.
++     */
++    fun y(knot: Int): Float {
++        return mY[knot]
++    }
++
++    /**
++     * Gets resolved x coordinate of first control point.
++     */
++    fun px1(segment: Int): Float {
++        ensureResolved()
++        return mPX1[segment]
++    }
++
++    /**
++     * Gets resolved y coordinate of first control point.
++     */
++    fun py1(segment: Int): Float {
++        ensureResolved()
++        return mPY1[segment]
++    }
++
++    /**
++     * Gets resolved x coordinate of second control point.
++     */
++    fun px2(segment: Int): Float {
++        ensureResolved()
++        return mPX2[segment]
++    }
++
++    /**
++     * Gets resolved y coordinate of second control point.
++     */
++    fun py2(segment: Int): Float {
++        ensureResolved()
++        return mPY2[segment]
++    }
++
++    /**
++     * Applies resolved control points to the specified Path.
++     */
++    fun applyToPath(path: Path) {
++        ensureResolved()
++
++        //path.reset();
++        //path.moveTo(mX[0], mY[0]);
++        val segments = mKnots - 1
++        if (segments == 1) {
++            path.lineTo(mX[1], mY[1])
++        } else {
++            for (segment in 0 until segments) {
++                val knot = segment + 1
++                path.cubicTo(
++                    mPX1[segment],
++                    mPY1[segment],
++                    mPX2[segment],
++                    mPY2[segment],
++                    mX[knot],
++                    mY[knot]
++                )
++            }
++        }
++    }
++
++    private fun ensureResolved() {
++        if (!mResolved) {
++            val segments = mKnots - 1
++            if (segments == 1) {
++                mPX1[0] = mX[0]
++                mPY1[0] = mY[0]
++                mPX2[0] = mX[1]
++                mPY2[0] = mY[1]
++            } else {
++                if (mResolver == null) {
++                    mResolver = ControlPointsResolver(segments)
++                }
++                mResolver!!.resolve(mX, mPX1, mPX2)
++                mResolver!!.resolve(mY, mPY1, mPY2)
++            }
++            mResolved = true
++        }
++    }
++
++    /**
++     * Copied from https://www.particleincell.com/wp-content/uploads/2012/06/bezier-spline.js
++     */
++    private class ControlPointsResolver internal constructor(private val mSegments: Int) {
++        private val mA: FloatArray
++        private val mB: FloatArray
++        private val mC: FloatArray
++        private val mR: FloatArray
++        fun resolve(K: FloatArray, P1: FloatArray, P2: FloatArray) {
++            val segments = mSegments
++            val last = segments - 1
++            val A = mA
++            val B = mB
++            val C = mC
++            val R = mR
++
++            // prepare left most segment.
++            A[0] = 0f
++            B[0] = 2f
++            C[0] = 1f
++            R[0] = K[0] + 2f * K[1]
++
++            // prepare internal segments.
++            for (i in 1 until last) {
++                A[i] = 1f
++                B[i] = 4f
++                C[i] = 1f
++                R[i] = 4f * K[i] + 2f * K[i + 1]
++            }
++
++            // prepare right most segment.
++            A[last] = 2f
++            B[last] = 7f
++            C[last] = 0f
++            R[last] = 8f * K[last] + K[segments]
++
++            // solves Ax=b with the Thomas algorithm (from Wikipedia).
++            for (i in 1 until segments) {
++                val m = A[i] / B[i - 1]
++                B[i] = B[i] - m * C[i - 1]
++                R[i] = R[i] - m * R[i - 1]
++            }
++            P1[last] = R[last] / B[last]
++            for (i in segments - 2 downTo 0) {
++                P1[i] = (R[i] - C[i] * P1[i + 1]) / B[i]
++            }
++
++            // we have p1, now compute p2.
++            for (i in 0 until last) {
++                P2[i] = 2f * K[i + 1] - P1[i + 1]
++            }
++            P2[last] = (K[segments] + P1[segments - 1]) / 2f
++        }
++
++        init {
++            mA = FloatArray(mSegments)
++            mB = FloatArray(mSegments)
++            mC = FloatArray(mSegments)
++            mR = FloatArray(mSegments)
++        }
++    }
++
++    init {
++        require(knots > 1) { "At least two knot points required" }
++        mKnots = knots
++        mX = FloatArray(knots)
++        mY = FloatArray(knots)
++        val segments = knots - 1
++        mPX1 = FloatArray(segments)
++        mPY1 = FloatArray(segments)
++        mPX2 = FloatArray(segments)
++        mPY2 = FloatArray(segments)
++        cur = 0
++    }
++}
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/CameraImageGraphic.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/CameraImageGraphic.kt
+new file mode 100644
+index 0000000..4105a1f
+--- /dev/null
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/CameraImageGraphic.kt
+@@ -0,0 +1,12 @@
++package expo.modules.camera
++
++import android.graphics.Bitmap
++import android.graphics.Canvas
++
++class CameraImageGraphic(overlay: GraphicOverlay?, private val bitmap: Bitmap) : GraphicOverlay.Graphic(
++    overlay!!
++) {
++    override fun draw(canvas: Canvas?) {
++        canvas!!.drawBitmap(bitmap, getTransformationMatrix(), null)
++    }
++}
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/FastGraphic.kt b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/FastGraphic.kt
+new file mode 100644
+index 0000000..dab0a79
+--- /dev/null
++++ b/node_modules/expo-face-detector/android/src/main/java/expo/modules/facedetector/Graphics/FastGraphic.kt
+@@ -0,0 +1,301 @@
++package expo.modules.camera
++
++import android.graphics.*
++import expo.modules.camera.GraphicOverlay.Graphic
++import com.google.mlkit.vision.face.FaceContour
++import com.google.mlkit.vision.face.Face
++
++/*
++ * Copyright 2020 Google LLC. All rights reserved.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ * Modifications copyright (C) 2020 M. Kapuscinski
++ */   class FastGraphic internal constructor(
++    overlay: GraphicOverlay,
++    face: Face,
++    lipsPaint: Paint,
++    lipsPaintOver: Paint,
++    eyeshadowPaint: Paint,
++    dummyShadow: Path?,
++    colors: IntArray,
++    bmShader: Shader
++) : Graphic(overlay) {
++    private val overlay_scale: Float
++    var face_scale = 1.0f
++    private val lipsPaint: Paint
++    private val lipsPaintOver: Paint
++    private val eyeshadowPaint: Paint
++    private val dummyCenter = PointF(89.5f, 63f)
++    private val dummySize = 100
++    private val dummyHeight = 73
++    private val dummyShadow: Path
++    private val colors: IntArray
++    private val bitmapPaint: Paint
++    private val face: Face
++
++    /**
++     * Draws the face annotations for position on the supplied canvas.
++     */
++    override fun draw(canvas: Canvas?) {
++        val face = face ?: return
++        drawLipsSpline(canvas)
++        drawEyeshadow(canvas, FaceContour.LEFT_EYE)
++        drawEyeshadow(canvas, FaceContour.RIGHT_EYE)
++    }
++
++    private fun calculateDistance(x1: Float, y1: Float, x2: Float, y2: Float): Double {
++        return Math.sqrt(Math.pow((x1 - x2).toDouble(), 2.0) + Math.pow((y1 - y2).toDouble(), 2.0))
++    }
++
++    private fun calculateDistance(first: PointF, second: PointF): Double {
++        return calculateDistance(first.x, first.y, second.x, second.y)
++    }
++
++    private fun calculateAngle(x1: Float, y1: Float, x2: Float, y2: Float): Float {
++        return Math.atan2((y2 - y1).toDouble(), (x2 - x1).toDouble()).toFloat()
++    }
++
++    private fun calculateAngle(first: PointF, second: PointF): Float {
++        return calculateAngle(first.x, first.y, second.x, second.y)
++    }
++
++    private fun getEyebrowCenter(top: List<PointF>, bottom: List<PointF>): PointF {
++        val brow = Path()
++        var it = top[0]
++        brow.moveTo(it.x, it.y)
++        for (point in top) {
++            brow.lineTo(point.x, point.y)
++        }
++        for (i in bottom.indices.reversed()) {
++            it = bottom[i]
++            brow.lineTo(it.x, it.y)
++        }
++        val boundingBox = RectF()
++        brow.computeBounds(boundingBox, true)
++        return PointF(boundingBox.centerX(), boundingBox.centerY())
++    }
++
++    private fun drawEyeshadow(canvas: Canvas?, eyeContour: Int) {
++        if (eyeContour != FaceContour.LEFT_EYE && eyeContour != FaceContour.RIGHT_EYE) return
++        val contour = face.getContour(eyeContour) ?: return
++        val eye: Int
++        eye = if (eyeContour == FaceContour.LEFT_EYE) -1 else 1
++        val shadow = Path()
++        val shadow_big = Path()
++        shadow_big.setFillType(Path.FillType.EVEN_ODD)
++        shadow_big.addPath(dummyShadow)
++        val points: List<PointF>
++        points = contour.points
++        //Log.d(TAG, "drawEyeshadow: " + points);
++        val first: PointF
++        val top_end: PointF
++        val iter: PointF
++        first = points[0]
++        top_end = points[8]
++        shadow.moveTo(translateX(first.x), translateY(first.y))
++        for (it in points) {
++            shadow.lineTo(translateX(it.x), translateY(it.y))
++        }
++        shadow.close()
++        val scaleMatrix = Matrix()
++        val rectF = RectF()
++        shadow.computeBounds(rectF, true)
++        scaleMatrix.setTranslate(rectF.centerX() - dummyCenter.x, rectF.centerY() - dummyCenter.y)
++        shadow_big.transform(scaleMatrix)
++        val scaleFactor = calculateDistance(
++            translateX(first.x), translateY(first.y), translateX(
++                points[8].x
++            ), translateY(points[8].y)
++        )
++            .toFloat() / dummySize
++        iter = if (eye == -1) getEyebrowCenter(
++            face.getContour(FaceContour.LEFT_EYEBROW_TOP)!!.points,
++            face.getContour(FaceContour.LEFT_EYEBROW_BOTTOM)!!.points
++        ) else getEyebrowCenter(
++            face.getContour(FaceContour.RIGHT_EYEBROW_TOP)!!.points,
++            face.getContour(FaceContour.RIGHT_EYEBROW_BOTTOM)!!.points
++        )
++        val scaleY = calculateDistance(
++            translateX(iter.x),
++            translateY(iter.y),
++            rectF.centerX(),
++            rectF.centerY()
++        )
++            .toFloat() / dummyHeight
++        scaleMatrix.setScale(eye * scaleFactor, scaleY, rectF.centerX(), rectF.centerY())
++        shadow_big.transform(scaleMatrix)
++        scaleMatrix.setRotate(
++            Math.toDegrees(-calculateAngle(first, top_end).toDouble())
++                .toFloat(), rectF.centerX(), rectF.centerY()
++        )
++        shadow_big.transform(scaleMatrix)
++        shadow_big.addPath(shadow)
++        val x1: Float
++        val x2: Float
++        if (eyeContour == FaceContour.LEFT_EYE) {
++            x1 = first.x
++            x2 = top_end.x
++        } else {
++            x1 = top_end.x
++            x2 = first.x
++        }
++        eyeshadowPaint.shader = LinearGradient(
++            translateX(x1), 0F,
++            translateX(x2), 0F,
++            colors,
++            null,
++            Shader.TileMode.MIRROR
++        )
++        canvas!!.drawPath(shadow_big, eyeshadowPaint)
++        canvas.drawPath(shadow, bitmapPaint)
++    }
++
++    private fun drawLipsSpline(canvas: Canvas?) {
++        val lips = Path()
++        lips.setFillType(Path.FillType.EVEN_ODD)
++        val firstBottom: PointF
++        var firstTop: PointF
++        var contour: FaceContour = face.getContour(FaceContour.LOWER_LIP_BOTTOM) ?: return
++        var points = contour.points
++        val lipsBottom = BezierSpline(face.getContour(FaceContour.LOWER_LIP_BOTTOM)!!.points.size)
++        firstBottom = points[0]
++        lips.moveTo(translateX(firstBottom.x), translateY(firstBottom.y))
++        var i = 0
++        for (it in points) {
++            lipsBottom[i++, translateX(it.x)] = translateY(it.y)
++        }
++        lipsBottom.applyToPath(lips)
++        contour = face.getContour(FaceContour.UPPER_LIP_TOP)!!
++        if (contour == null) return
++        points = contour.points
++        val lipsTop = BezierSpline(face.getContour(FaceContour.UPPER_LIP_TOP)!!.points.size)
++        firstTop = points[0]
++        lips.lineTo(translateX(firstTop.x), translateY(firstTop.y))
++        i = 0
++        for (it in points) {
++            lipsTop[i++, translateX(it.x)] = translateY(it.y)
++        }
++        lipsTop.applyToPath(lips)
++        lips.close()
++        val scale = calculateDistance(firstBottom, firstTop)
++            .toFloat()
++        //BlurMaskFilter blur = new BlurMaskFilter(scale/10, BlurMaskFilter.Blur.NORMAL);
++        val blur = BlurMaskFilter(20F, BlurMaskFilter.Blur.NORMAL)
++        val blur2 = BlurMaskFilter(40F, BlurMaskFilter.Blur.NORMAL)
++        lipsPaint.maskFilter = blur
++        lipsPaintOver.maskFilter = blur
++        eyeshadowPaint.maskFilter = blur2
++
++        //Log.d(TAG, "drawLipsSpline: scale="+scale);
++        val delta = calculateDistance(
++            face.getContour(FaceContour.UPPER_LIP_BOTTOM)!!.points[4],
++            face.getContour(FaceContour.LOWER_LIP_TOP)!!.points[4]
++        )
++            .toFloat()
++        //Log.d(TAG, "drawLipsSpline: delta="+delta);
++        if (scale / 40 < delta) {
++            //Log.d(TAG, "drawLipsSpline: weszło");
++            val lipsInner = Path()
++            contour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)!!
++            points = contour.points
++            firstTop = points[0]
++            lipsInner.moveTo(translateX(firstTop.x), translateY(firstTop.y))
++            for (it in points) {
++                lipsInner.lineTo(translateX(it.x), translateY(it.y))
++            }
++            contour = face.getContour(FaceContour.LOWER_LIP_TOP)!!
++            points = contour.points
++            for (it in points) {
++                lipsInner.lineTo(translateX(it.x), translateY(it.y))
++            }
++            lips.addPath(lipsInner)
++        }
++        canvas!!.drawPath(lips, lipsPaint)
++        val scaleMatrix = Matrix()
++        val rectF = RectF()
++        lips.computeBounds(rectF, true)
++        scaleMatrix.setScale(0.75f, 0.75f, rectF.centerX(), rectF.centerY())
++        //lips.transform(scaleMatrix);
++        canvas.drawPath(lips, lipsPaintOver)
++    }
++
++    private fun drawLips(canvas: Canvas) {
++        val lip_upper = Path()
++        val lip_lower = Path()
++        lip_upper.fillType = Path.FillType.EVEN_ODD
++        lip_lower.fillType = Path.FillType.EVEN_ODD
++        var prev: PointF?
++        val first: PointF
++        var it: PointF? = null
++        // LOWER
++        var contour: FaceContour = face.getContour(FaceContour.LOWER_LIP_BOTTOM) ?: return
++        var points = contour.points
++        first = points[0]
++        prev = first
++        lip_lower.moveTo(translateX(first.x), translateY(first.y))
++        for (i in 1 until points.size) {
++            it = points[i]
++            lip_lower.cubicTo(
++                translateX(prev!!.x),
++                translateY(prev.y),
++                translateX(it.x),
++                translateY(it.y),
++                translateX(it.x),
++                translateY(it.y)
++            )
++            prev = it
++        }
++        lipsPaint.maskFilter =
++            BlurMaskFilter(Math.abs(it!!.x - first.x) / 10, BlurMaskFilter.Blur.NORMAL)
++        contour = face.getContour(FaceContour.UPPER_LIP_TOP) ?: return
++        points = contour.points
++        for (i in points.indices) {
++            it = points[i]
++            lip_lower.cubicTo(
++                translateX(prev!!.x),
++                translateY(prev.y),
++                translateX(it.x),
++                translateY(it.y),
++                translateX(it.x),
++                translateY(it.y)
++            )
++            prev = it
++        }
++        lip_lower.close()
++        canvas.drawPath(lip_lower, lipsPaint)
++    }
++
++    override fun scale(imagePixel: Float): Float {
++        return imagePixel * overlay_scale * face_scale
++    }
++
++    companion object {
++        private const val TAG = "FaceGraphic"
++    }
++
++    init {
++        overlay_scale = overlay.scaleFactor
++        this.lipsPaint = lipsPaint
++        this.lipsPaintOver = lipsPaintOver
++        this.face = face
++        this.eyeshadowPaint = eyeshadowPaint
++        this.dummyShadow = Path()
++        this.dummyShadow.addPath(dummyShadow!!)
++        this.colors = colors
++        bitmapPaint = Paint()
++        bmShader.setLocalMatrix(getTransformationMatrix())
++        bitmapPaint.shader = bmShader
++        val blur = BlurMaskFilter(10F, BlurMaskFilter.Blur.NORMAL)
++        bitmapPaint.maskFilter = blur
++    }
++}
+\ No newline at end of file
+diff --git a/node_modules/expo-face-detector/src/FaceDetector.ts b/node_modules/expo-face-detector/src/FaceDetector.ts
+index 0e92632..81e5132 100644
+--- a/node_modules/expo-face-detector/src/FaceDetector.ts
++++ b/node_modules/expo-face-detector/src/FaceDetector.ts
+@@ -16,71 +16,16 @@ export type FaceFeature = {
+    * set to `FaceDetectorClassifications.all`.
+    */
+   smilingProbability?: number;
+-  /**
+-   * Position of the left ear in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  leftEarPosition?: Point;
+-  /**
+-   * Position of the right ear in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  rightEarPosition?: Point;
+-  /**
+-   * Position of the left eye in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  leftEyePosition?: Point;
+   /**
+    * Probability that the left eye is open. Returned only if detection classifications property is
+    * set to `FaceDetectorClassifications.all`.
+    */
+   leftEyeOpenProbability?: number;
+-  /**
+-   * Position of the right eye in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  rightEyePosition?: Point;
+   /**
+    * Probability that the right eye is open. Returned only if detection classifications property is
+    * set to `FaceDetectorClassifications.all`.
+    */
+   rightEyeOpenProbability?: number;
+-  /**
+-   * Position of the left cheek in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  leftCheekPosition?: Point;
+-  /**
+-   * Position of the right cheek in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  rightCheekPosition?: Point;
+-  /**
+-   * Position of the left edge of the mouth in image coordinates. Returned only if detection
+-   * classifications property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  leftMouthPosition?: Point;
+-  /**
+-   * Position of the center of the mouth in image coordinates. Returned only if detection
+-   * classifications property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  mouthPosition?: Point;
+-  /**
+-   * Position of the right edge of the mouth in image coordinates. Returned only if detection
+-   * classifications property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  rightMouthPosition?: Point;
+-  /**
+-   * Position of the bottom edge of the mouth in image coordinates. Returned only if detection
+-   * classifications property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  bottomMouthPosition?: Point;
+-  /**
+-   * Position of the nose base in image coordinates. Returned only if detection classifications
+-   * property is set to `FaceDetectorLandmarks.all`.
+-   */
+-  noseBasePosition?: Point;
+   /**
+    * Yaw angle of the face (heading, turning head left or right).
+    */
+@@ -94,6 +39,82 @@ export type FaceFeature = {
+    * have the same `faceID`).
+    */
+   faceID?: number;
++
++  landmarks: FaceLandmarks;
++
++  contours: FaceContours;
++};
++
++export type FaceLandmarks = {
++  /**
++   * Position of the left ear in image coordinates. Returned only if detection classifications
++   * property is set to `FaceDetectorLandmarks.all`.
++   */
++   leftEarPosition?: Point;
++   /**
++    * Position of the right ear in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   rightEarPosition?: Point;
++   /**
++    * Position of the left eye in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   leftEyePosition?: Point;
++   /**
++    * Position of the right eye in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   rightEyePosition?: Point;
++   /**
++    * Position of the left cheek in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   leftCheekPosition?: Point;
++   /**
++    * Position of the right cheek in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   rightCheekPosition?: Point;
++   /**
++    * Position of the left edge of the mouth in image coordinates. Returned only if detection
++    * classifications property is set to `FaceDetectorLandmarks.all`.
++    */
++   leftMouthPosition?: Point;
++   /**
++    * Position of the center of the mouth in image coordinates. Returned only if detection
++    * classifications property is set to `FaceDetectorLandmarks.all`.
++    */
++   mouthPosition?: Point;
++   /**
++    * Position of the right edge of the mouth in image coordinates. Returned only if detection
++    * classifications property is set to `FaceDetectorLandmarks.all`.
++    */
++   rightMouthPosition?: Point;
++   /**
++    * Position of the bottom edge of the mouth in image coordinates. Returned only if detection
++    * classifications property is set to `FaceDetectorLandmarks.all`.
++    */
++   bottomMouthPosition?: Point;
++   /**
++    * Position of the nose base in image coordinates. Returned only if detection classifications
++    * property is set to `FaceDetectorLandmarks.all`.
++    */
++   noseBasePosition?: Point;
++}
++
++export type FaceContours = {
++  lowerLipBottom: Contour;
++  lowerLipTop: Contour;
++  upperLipBottom: Contour;
++  upperLipTop: Contour;
++  leftEye: Contour;
++  rightEye: Contour;
++}
++
++export type Contour = {
++    [idx: number] : Point;
++    size: number;
+ };
+ 
+ // @needsAudit
+@@ -123,6 +144,12 @@ export enum FaceDetectorLandmarks {
+   all = 2,
+ }
+ 
++// @docsMissing
++export enum FaceDetectorContours {
++  none = 1,
++  all = 2,
++}
++
+ // @docsMissing
+ export enum FaceDetectorClassifications {
+   none = 1,
+@@ -164,6 +191,11 @@ export type DetectionOptions = {
+    * Use `FaceDetector.FaceDetectorLandmarks.{all, none}`.
+    */
+   detectLandmarks?: FaceDetectorLandmarks;
++  /**
++   * Whether to detect and return contours of face landmarks.
++   * Use `FaceDetector.FaceDetectorContours.{all, none}`.
++   */
++  detectContours?: FaceDetectorContours;
+   /**
+    * Whether to run additional classifications on detected faces (smiling probability, open eye
+    * probabilities). Use `FaceDetector.FaceDetectorClassifications.{all, none}`.

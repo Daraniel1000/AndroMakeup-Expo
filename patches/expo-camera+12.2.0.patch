@@ -1,0 +1,386 @@
+diff --git a/node_modules/expo-camera/android/.gradle/6.8/fileChanges/last-build.bin b/node_modules/expo-camera/android/.gradle/6.8/fileChanges/last-build.bin
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.gradle/6.8/fileHashes/fileHashes.lock b/node_modules/expo-camera/android/.gradle/6.8/fileHashes/fileHashes.lock
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.gradle/6.8/gc.properties b/node_modules/expo-camera/android/.gradle/6.8/gc.properties
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.gradle/checksums/checksums.lock b/node_modules/expo-camera/android/.gradle/checksums/checksums.lock
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.gradle/configuration-cache/gc.properties b/node_modules/expo-camera/android/.gradle/configuration-cache/gc.properties
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.gradle/vcs-1/gc.properties b/node_modules/expo-camera/android/.gradle/vcs-1/gc.properties
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/expo-camera/android/.idea/.gitignore b/node_modules/expo-camera/android/.idea/.gitignore
+new file mode 100644
+index 0000000..26d3352
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/.gitignore
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml
+diff --git a/node_modules/expo-camera/android/.idea/gradle.xml b/node_modules/expo-camera/android/.idea/gradle.xml
+new file mode 100644
+index 0000000..630989d
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/gradle.xml
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="GradleSettings">
++    <option name="linkedExternalProjectsSettings">
++      <GradleProjectSettings>
++        <option name="testRunner" value="GRADLE" />
++        <option name="distributionType" value="DEFAULT_WRAPPED" />
++        <option name="externalProjectPath" value="$PROJECT_DIR$" />
++        <option name="resolveModulePerSourceSet" value="false" />
++      </GradleProjectSettings>
++    </option>
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-camera/android/.idea/misc.xml b/node_modules/expo-camera/android/.idea/misc.xml
+new file mode 100644
+index 0000000..f845854
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/misc.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectRootManager" version="2" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/build/classes" />
++  </component>
++  <component name="ProjectType">
++    <option name="id" value="Android" />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-camera/android/.idea/modules.xml b/node_modules/expo-camera/android/.idea/modules.xml
+new file mode 100644
+index 0000000..bf609e0
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/modules.xml
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-camera/android/.idea/modules/android.iml b/node_modules/expo-camera/android/.idea/modules/android.iml
+new file mode 100644
+index 0000000..5b2d407
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/modules/android.iml
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":" />
++        <option name="LAST_SUCCESSFUL_SYNC_AGP_VERSION" />
++        <option name="LAST_KNOWN_AGP_VERSION" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$/../.." />
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff --git a/node_modules/expo-camera/android/.idea/workspace.xml b/node_modules/expo-camera/android/.idea/workspace.xml
+new file mode 100644
+index 0000000..012d827
+--- /dev/null
++++ b/node_modules/expo-camera/android/.idea/workspace.xml
+@@ -0,0 +1,38 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="NONE" />
++  </component>
++  <component name="ChangeListManager">
++    <list default="true" id="5aa98236-4a00-4c3b-ac01-1d13c3e7f98f" name="Default Changelist" comment="" />
++    <option name="SHOW_DIALOG" value="false" />
++    <option name="HIGHLIGHT_CONFLICTS" value="true" />
++    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++    <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="ProjectId" id="2ADSJlLc98LhMqRKDsmrbRWY7Ma" />
++  <component name="ProjectViewState">
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++  </component>
++  <component name="PropertiesComponent">
++    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
++    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
++    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
++    <property name="cidr.known.project.marker" value="true" />
++    <property name="dart.analysis.tool.window.visible" value="false" />
++    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
++    <property name="show.migrate.to.gradle.popup" value="false" />
++  </component>
++  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
++  <component name="TaskManager">
++    <task active="true" id="Default" summary="Default task">
++      <changelist id="5aa98236-4a00-4c3b-ac01-1d13c3e7f98f" name="Default Changelist" comment="" />
++      <created>1654542596045</created>
++      <option name="number" value="Default" />
++      <option name="presentableId" value="Default" />
++      <updated>1654542596045</updated>
++    </task>
++    <servers />
++  </component>
++</project>
+\ No newline at end of file
+diff --git a/node_modules/expo-camera/android/local.properties b/node_modules/expo-camera/android/local.properties
+new file mode 100644
+index 0000000..ba66ed8
+--- /dev/null
++++ b/node_modules/expo-camera/android/local.properties
+@@ -0,0 +1,8 @@
++## This file must *NOT* be checked into Version Control Systems,
++# as it contains information specific to your local configuration.
++#
++# Location of the SDK. This is only used by Gradle.
++# For customization when using a Version Control System, please read the
++# header note.
++#Mon Jun 06 21:09:52 CEST 2022
++sdk.dir=C\:\\Users\\oem\\AppData\\Local\\Android\\Sdk
+diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
+index 01497e5..c3b8aab 100644
+--- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
++++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
+@@ -113,4 +113,24 @@ class CameraViewManager(
+   fun setFaceDetectorSettings(view: ExpoCameraView, settings: Map<String, Any>?) {
+     view.setFaceDetectorSettings(settings)
+   }
++
++  @ExpoProp(name = "lipstickColor")
++  fun setLipstickColor(view: ExpoCameraView, lipstickColor: String?) {
++    view.setLipstickColor(lipstickColor)
++  }
++
++  @ExpoProp(name = "eyeshadowColor1")
++  fun setEyeshadowColor1(view: ExpoCameraView, eyeshadowColor: String?) {
++    view.setEyeshadowColor(eyeshadowColor, 0)
++  }
++
++  @ExpoProp(name = "eyeshadowColor2")
++  fun setEyeshadowColor2(view: ExpoCameraView, eyeshadowColor: String?) {
++    view.setEyeshadowColor(eyeshadowColor, 1)
++  }
++
++  @ExpoProp(name = "eyeshadowColor3")
++  fun setEyeshadowColor3(view: ExpoCameraView, eyeshadowColor: String?) {
++    view.setEyeshadowColor(eyeshadowColor, 2)
++  }
+ }
+diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
+index ca796b1..9e1ed61 100644
+--- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
++++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
+@@ -12,6 +12,9 @@ import android.view.View
+ 
+ import com.google.android.cameraview.CameraView
+ 
++import android.widget.FrameLayout
++import android.graphics.*
++
+ import expo.modules.camera.CameraViewHelper.emitCameraReadyEvent
+ import expo.modules.camera.CameraViewHelper.emitMountErrorEvent
+ import expo.modules.camera.CameraViewHelper.getCorrectCameraRotation
+@@ -74,6 +77,7 @@ class ExpoCameraView(
+   private var isPaused = false
+   private var isNew = true
+   private val eventEmitter: EventEmitter by moduleRegistry()
++  private val overlay: GraphicOverlay = GraphicOverlay(themedReactContext)
+ 
+   // Concurrency lock for scanners to avoid flooding the runtime
+   @Volatile
+@@ -89,12 +93,21 @@ class ExpoCameraView(
+   private var shouldDetectFaces = false
+   private var mShouldScanBarCodes = false
+ 
++  // Makeup
++  private val dummyShadow = Path()
++  private val lipsPaint = Paint()
++  private val lipsPaintOver = Paint()
++  private val eyeshadowPaint = Paint()
++  private var shadowColors = IntArray(3)
++
+   override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+     val preview = view ?: return
+     setBackgroundColor(Color.BLACK)
+     val width = right - left
+     val height = bottom - top
+     preview.layout(0, 0, width, height)
++    val preview2 = overlay ?: return
++    preview2.layout(0, 0, width, height)
+   }
+ 
+   @SuppressLint("MissingSuperCall")
+@@ -120,7 +133,7 @@ class ExpoCameraView(
+         // preview is already first in children list - do not reorder anything
+         return
+       }
+-      if (childView !== this.view) {
++      if (childView !== this.view && childView !== this.overlay) {
+         childrenToBeReordered.add(childView)
+       }
+     }
+@@ -252,6 +265,24 @@ class ExpoCameraView(
+     }
+   }
+ 
++  fun setLipstickColor(lipstickColor: String?)
++  {
++    if(lipstickColor != null) {
++      lipsPaint.color = Color.parseColor(lipstickColor!!)
++      lipsPaintOver.color = lipsPaint.color
++      lipsPaint.alpha = 125
++      lipsPaintOver.alpha = 50
++      lipsPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
++    }
++  }
++
++  fun setEyeshadowColor(eyeshadowColor: String?, index: Int)
++  {
++    if(eyeshadowColor != null) {
++      shadowColors[index] = Color.parseColor(eyeshadowColor!!)
++    }
++  }
++
+   override fun onFacesDetected(faces: List<Bundle>) {
+     if (shouldDetectFaces) {
+       emitFacesDetectedEvent(eventEmitter, this, faces)
+@@ -269,11 +300,41 @@ class ExpoCameraView(
+     faceDetectorTaskLock = false
+   }
+ 
++  private fun setupPaints() {
++    val lipstick = Color.rgb(194, 83, 107)
++    lipsPaint.color = lipstick
++    lipsPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
++    lipsPaintOver.color = lipstick
++    lipsPaint.alpha = 125
++    lipsPaintOver.alpha = 50
++    eyeshadowPaint.alpha = 200
++    //eyeshadowPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.OVERLAY));
++    shadowColors[0] = Color.rgb(143, 15, 58)
++    shadowColors[1] = Color.rgb(205, 0, 93)
++    shadowColors[2] = Color.rgb(221, 96, 129)
++    val dummyCoords = intArrayOf(16,49,21,42,31,37,45,32,57,28,69,26,87,24,102,26,117,31,130,39,140,50,145,61,148,68,128,74,112,82,92,87,75,87,58,83,40,75,25,64,21,60,17,56,16,49)
++    dummyShadow.moveTo(dummyCoords[0].toFloat(), dummyCoords[1].toFloat())
++    var i = 2
++    while (i < dummyCoords.size) {
++        dummyShadow.lineTo(dummyCoords[i].toFloat(), dummyCoords[i + 1].toFloat())
++        i += 2
++    }
++    dummyShadow.close()
++}
++
+   init {
+     initBarCodeScanner()
++    setupPaints()
++    addView(overlay)
++    bringChildToFront(overlay)    
++    overlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+     isChildrenDrawingOrderEnabled = true
+     val uIManager: UIManager by moduleRegistry()
+     uIManager.registerLifecycleEventListener(this)
++    // this.view.setVisibility(View.INVISIBLE)
++    // val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
++    overlay.setBackgroundColor(Color.RED)
++    // overlay.setLayoutParams(params)
+     addCallback(object : Callback() {
+       override fun onCameraOpened(cameraView: CameraView) {
+         emitCameraReadyEvent(eventEmitter, cameraView)
+@@ -320,7 +381,8 @@ class ExpoCameraView(
+           val scaleX = cameraView.width.toDouble() / (dimensions.width * density)
+           val scaleY = cameraView.height.toDouble() / (dimensions.height * density)
+           val delegate = cameraView as FaceDetectorAsyncTaskDelegate
+-          val task = faceDetector?.let { FaceDetectorTask(delegate, it, data, width, height, correctRotation, facing == FACING_FRONT, scaleX, scaleY) }
++          val task = faceDetector?.let { FaceDetectorTask(delegate, it, data, width, height, correctRotation, facing == FACING_FRONT, scaleX, scaleY, overlay, 
++                                                          lipsPaint, lipsPaintOver, eyeshadowPaint, dummyShadow, shadowColors) }
+           task?.execute()
+         }
+       }
+diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/FaceDetectorTask.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/FaceDetectorTask.kt
+index 7ddb729..474c0c3 100644
+--- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/FaceDetectorTask.kt
++++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/tasks/FaceDetectorTask.kt
+@@ -1,6 +1,9 @@
+ package expo.modules.camera.tasks
+ 
+ import expo.modules.interfaces.facedetector.FaceDetectorInterface
++import expo.modules.camera.GraphicOverlay
++import android.graphics.Path
++import android.graphics.Paint
+ 
+ class FaceDetectorTask(
+   private val mDelegate: FaceDetectorAsyncTaskDelegate,
+@@ -11,7 +14,13 @@ class FaceDetectorTask(
+   private val mRotation: Int,
+   private val mMirrored: Boolean,
+   private val mScaleX: Double,
+-  private val mScaleY: Double
++  private val mScaleY: Double,
++  private val overlay: GraphicOverlay,
++  private val lipsPaint: Paint?, 
++  private val lipsPaintOver: Paint?, 
++  private val eyeshadowPaint: Paint?, 
++  private val dummyShadow: Path?, 
++  private val shadowColors: IntArray?
+ ) {
+   fun execute() {
+     mFaceDetector.detectFaces(
+@@ -28,7 +37,8 @@ class FaceDetectorTask(
+         mDelegate.onFaceDetectionError(mFaceDetector)
+         mDelegate.onFaceDetectingTaskCompleted()
+       },
+-      { skippedReason -> mDelegate.onFaceDetectingTaskCompleted() }
++      { skippedReason -> mDelegate.onFaceDetectingTaskCompleted() },
++      overlay, lipsPaint, lipsPaintOver, eyeshadowPaint, dummyShadow, shadowColors
+     )
+   }
+ }
+diff --git a/node_modules/expo-camera/src/Camera.types.ts b/node_modules/expo-camera/src/Camera.types.ts
+index 2698406..350e430 100644
+--- a/node_modules/expo-camera/src/Camera.types.ts
++++ b/node_modules/expo-camera/src/Camera.types.ts
+@@ -404,6 +404,10 @@ export type CameraProps = ViewProps & {
+    * @platform web
+    */
+   poster?: string;
++  lipstickColor?: string;
++  eyeshadowColor1?: string;
++  eyeshadowColor3?: string;
++  eyeshadowColor2?: string;
+ };
+ 
+ export type CameraNativeProps = {
+@@ -430,6 +434,10 @@ export type CameraNativeProps = {
+   ratio?: string;
+   useCamera2Api?: boolean;
+   poster?: string;
++  lipstickColor?: string;
++  eyeshadowColor1?: string;
++  eyeshadowColor3?: string;
++  eyeshadowColor2?: string;
+ };
+ 
+ export type BarCodeSettings = {

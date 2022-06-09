@@ -1,0 +1,75 @@
+diff --git a/node_modules/react-native-expandable-fab/dist/index.d.ts b/node_modules/react-native-expandable-fab/dist/index.d.ts
+index b4ff08b..d367ce5 100644
+--- a/node_modules/react-native-expandable-fab/dist/index.d.ts
++++ b/node_modules/react-native-expandable-fab/dist/index.d.ts
+@@ -10,6 +10,7 @@ interface FabMenuElement {
+     name: string;
+     icon: ReactNode;
+     text?: ReactNode;
++    color?: string;
+     callback: () => void;
+ }
+ declare const ExpandableFloatingAction: (props: ExpandableFabProps) => JSX.Element;
+diff --git a/node_modules/react-native-expandable-fab/dist/index.js b/node_modules/react-native-expandable-fab/dist/index.js
+index 857aa8d..3ae2c56 100644
+--- a/node_modules/react-native-expandable-fab/dist/index.js
++++ b/node_modules/react-native-expandable-fab/dist/index.js
+@@ -49,12 +49,12 @@ const ExpandableFloatingAction = (props) => {
+             React.createElement(Animated.View, { key: menuElement.name, style: {
+                     ...styles.smallContainerStyle,
+                     opacity: fadeIn,
+-                    transform: [{ translateY: topOffsetY }]
++                    transform: [{ translateX: topOffsetY }]
+                 } },
+-                !!menuElement.text ? menuElement.text : null,
++                //!!menuElement.text ? menuElement.text : null,
+                 React.createElement(TouchableOpacity, { onPress: () => menuElement.callback(), style: {
+                         ...styles.mediumButton, ...styles.shadow,
+-                        backgroundColor: props.secondaryColor || 'white'
++                        backgroundColor: menuElement.color || 'white'
+                     } }, menuElement.icon))
+             : null)),
+         React.createElement(TouchableOpacity, { onPress: () => toggleFab(), style: {
+@@ -64,12 +64,12 @@ const ExpandableFloatingAction = (props) => {
+ };
+ const styles = StyleSheet.create({
+     container: {
+-        position: 'absolute',
+-        flexDirection: 'column',
++        // position: 'absolute',
++        flexDirection: 'row',
+         alignItems: 'flex-end',
+         justifyContent: 'flex-end',
+-        bottom: 24,
+-        right: 24,
++        // bottom: 24,
++        // right: 24,
+     },
+     mainButton: {
+         width: 64,
+@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
+         alignItems: 'center',
+         justifyContent: 'center',
+         marginTop: 10,
++        opacity: 0.8,
+     },
+     mediumButton: {
+         width: 42,
+@@ -88,13 +89,15 @@ const styles = StyleSheet.create({
+         borderWidth: 0.5,
+         margin: 4,
+         marginRight: 10,
++        marginBottom: 10,
+         alignItems: 'center',
+         justifyContent: 'center',
++        opacity: 0.8,
+     },
+     smallContainerStyle: {
+-        flex: 1,
++        // flex: 1,
+         flexDirection: 'row',
+-        alignItems: 'center'
++        alignItems: 'flex-end'
+     },
+     shadow: {
+         shadowColor: 'rgba(0,0,0, 0.5)',
