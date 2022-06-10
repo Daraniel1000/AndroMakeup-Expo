@@ -190,7 +190,7 @@ index 01497e5..c3b8aab 100644
 +  }
  }
 diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
-index ca796b1..9e1ed61 100644
+index ca796b1..f5bcfce 100644
 --- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
 +++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
 @@ -12,6 +12,9 @@ import android.view.View
@@ -267,7 +267,7 @@ index ca796b1..9e1ed61 100644
    override fun onFacesDetected(faces: List<Bundle>) {
      if (shouldDetectFaces) {
        emitFacesDetectedEvent(eventEmitter, this, faces)
-@@ -269,11 +300,41 @@ class ExpoCameraView(
+@@ -269,11 +300,38 @@ class ExpoCameraView(
      faceDetectorTaskLock = false
    }
  
@@ -302,14 +302,11 @@ index ca796b1..9e1ed61 100644
      isChildrenDrawingOrderEnabled = true
      val uIManager: UIManager by moduleRegistry()
      uIManager.registerLifecycleEventListener(this)
-+    // this.view.setVisibility(View.INVISIBLE)
-+    // val params = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-+    overlay.setBackgroundColor(Color.RED)
-+    // overlay.setLayoutParams(params)
++    overlay.setBackgroundColor(Color.BLACK)
      addCallback(object : Callback() {
        override fun onCameraOpened(cameraView: CameraView) {
          emitCameraReadyEvent(eventEmitter, cameraView)
-@@ -320,7 +381,8 @@ class ExpoCameraView(
+@@ -320,7 +378,8 @@ class ExpoCameraView(
            val scaleX = cameraView.width.toDouble() / (dimensions.width * density)
            val scaleY = cameraView.height.toDouble() / (dimensions.height * density)
            val delegate = cameraView as FaceDetectorAsyncTaskDelegate

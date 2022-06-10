@@ -24,6 +24,7 @@ export default function App() {
   if (!isLoadingComplete || hasPermission === 0) {
     return (
     <View style={styles.container}>
+      <Text style={[styles.title, {flex:0.4, fontSize: 35}]}>PLEASE WAIT</Text>
       <ActivityIndicator style={styles.container} size={100} />
     </View>);
   } else {

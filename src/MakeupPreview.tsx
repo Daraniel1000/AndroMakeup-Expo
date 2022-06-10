@@ -8,7 +8,7 @@ import { ColorHEX, ColorPickerModal } from "./ColorPickerModal";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ExpandableFloatingAction from "react-native-expandable-fab";
 
-export type ColorSetter = (x: any) => void;
+export type ColorSetter = (x: ColorHEX) => void;
 
 const starterColor: ColorHEX = "#c2536b";
 
@@ -28,9 +28,9 @@ export default function MakeupPreview() {
 
     //Functions
     const handleFacesDetected = (result: FaceDetectionResult) => {
-        const faces = result.faces;
+        // const faces = result.faces;
         //@ts-ignore
-        if (faces) console.log(faces[0]["face"]);
+        // if (faces) console.log(faces[0]["face"]);
     };
 
     const requestShowModal = (color: ColorHEX, colorSetter: ColorSetter, title?: string) => {
@@ -42,6 +42,7 @@ export default function MakeupPreview() {
 
     //Effects
     useEffect(() => {
+        //to remove lag caused by face detector while modal is open
         if (modalVisible) {
             cameraRef.current?.pausePreview();
         } else {
@@ -61,12 +62,13 @@ export default function MakeupPreview() {
             <Camera
                 style={styles.camera}
                 type={CameraType.front}
+                //has to have an onFacesDetection to work
                 onFacesDetected={handleFacesDetected}
                 faceDetectorSettings={{
                     mode: FaceDetector.FaceDetectorMode.fast,
                     runClassifications: FaceDetector.FaceDetectorClassifications.none,
                     detectContours: 2,
-                    minDetectionInterval: 10,
+                    minDetectionInterval: 1,
                     tracking: true,
                 }}
                 ref={(ref) => {
