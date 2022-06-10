@@ -1,6 +1,6 @@
 import { Camera, CameraType, FaceDetectionResult } from "expo-camera";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
 import { View as DefaultView } from "react-native";
 import * as FaceDetector from "expo-face-detector";
@@ -19,6 +19,7 @@ export default function MakeupPreview() {
     const [eyeshadowColor1, setEyeshadowColor1] = useState(starterColor);
     const [eyeshadowColor2, setEyeshadowColor2] = useState(starterColor);
     const [eyeshadowColor3, setEyeshadowColor3] = useState(starterColor);
+    const [showLoader, setShowLoader] = useState(false);
 
     //Modal state
     const [modalVisible, setModalVisible] = useState(false);
@@ -39,6 +40,25 @@ export default function MakeupPreview() {
         setModalTitle(title);
         setModalVisible(true);
     };
+
+    const simulateWebResponse = async (pictureUri: any) => {
+        //don't send to backend because I don't have the backend
+        await new Promise(r => setTimeout(r, 2000));
+        setLipsColor("#b04860");
+        setEyeshadowColor1("#683a45");
+        setEyeshadowColor2("#9a5f63");
+        setEyeshadowColor3("#a97a78");
+    }
+
+    const requestWebColors = async () => {
+        const pictureUri = await cameraRef.current?.takePictureAsync();
+        setShowLoader(true);
+        cameraRef.current?.pausePreview();
+        //simulate waiting for response
+        await simulateWebResponse(pictureUri);
+        cameraRef.current?.resumePreview();
+        setShowLoader(false);
+    }
 
     //Effects
     useEffect(() => {
@@ -117,6 +137,14 @@ export default function MakeupPreview() {
                         {/* @ts-ignore */}
                         <MaterialCommunityIcons name="lipstick" color="white" style={styles.icon} />
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.button, { backgroundColor: "#2196F3" }]}
+                        onPress={() => requestWebColors()}
+                    >
+                        {/* @ts-ignore */}
+                        <MaterialCommunityIcons name="robot" color="white" style={styles.icon} />
+                    </TouchableOpacity>
+                    <ActivityIndicator animating={showLoader} style={styles.loader} size={100} />
                 </DefaultView>
             </Camera>
         </View>
@@ -124,6 +152,13 @@ export default function MakeupPreview() {
 }
 
 const styles = StyleSheet.create({
+    loader: {
+        position: "absolute",
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+    },
     icon: {
         paddingTop: 2,
         fontSize: 30,
