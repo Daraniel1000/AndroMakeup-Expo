@@ -161,10 +161,10 @@ index 0000000..ba66ed8
 +#Mon Jun 06 21:09:52 CEST 2022
 +sdk.dir=C\:\\Users\\oem\\AppData\\Local\\Android\\Sdk
 diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
-index 01497e5..c3b8aab 100644
+index 01497e5..25cf5c2 100644
 --- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
 +++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/CameraViewManager.kt
-@@ -113,4 +113,24 @@ class CameraViewManager(
+@@ -113,4 +113,29 @@ class CameraViewManager(
    fun setFaceDetectorSettings(view: ExpoCameraView, settings: Map<String, Any>?) {
      view.setFaceDetectorSettings(settings)
    }
@@ -188,9 +188,14 @@ index 01497e5..c3b8aab 100644
 +  fun setEyeshadowColor3(view: ExpoCameraView, eyeshadowColor: String?) {
 +    view.setEyeshadowColor(eyeshadowColor, 2)
 +  }
++
++  @ExpoProp(name = "pictureHeight")
++  fun setPictureHeight(view: ExpoCameraView, height: Int?) {
++    view.setHeight(height)
++  }
  }
 diff --git a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
-index ca796b1..f5bcfce 100644
+index ca796b1..3e999a3 100644
 --- a/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
 +++ b/node_modules/expo-camera/android/src/main/java/expo/modules/camera/ExpoCameraView.kt
 @@ -12,6 +12,9 @@ import android.view.View
@@ -211,7 +216,7 @@ index ca796b1..f5bcfce 100644
  
    // Concurrency lock for scanners to avoid flooding the runtime
    @Volatile
-@@ -89,12 +93,21 @@ class ExpoCameraView(
+@@ -89,12 +93,22 @@ class ExpoCameraView(
    private var shouldDetectFaces = false
    private var mShouldScanBarCodes = false
  
@@ -221,19 +226,21 @@ index ca796b1..f5bcfce 100644
 +  private val lipsPaintOver = Paint()
 +  private val eyeshadowPaint = Paint()
 +  private var shadowColors = IntArray(3)
++  private var pictureHeight = 480
 +
    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
      val preview = view ?: return
      setBackgroundColor(Color.BLACK)
      val width = right - left
      val height = bottom - top
-     preview.layout(0, 0, width, height)
+-    preview.layout(0, 0, width, height)
++    preview.layout(0, 0, pictureHeight * width / height, pictureHeight)
 +    val preview2 = overlay ?: return
 +    preview2.layout(0, 0, width, height)
    }
  
    @SuppressLint("MissingSuperCall")
-@@ -120,7 +133,7 @@ class ExpoCameraView(
+@@ -120,7 +134,7 @@ class ExpoCameraView(
          // preview is already first in children list - do not reorder anything
          return
        }
@@ -242,7 +249,7 @@ index ca796b1..f5bcfce 100644
          childrenToBeReordered.add(childView)
        }
      }
-@@ -252,6 +265,24 @@ class ExpoCameraView(
+@@ -252,6 +266,30 @@ class ExpoCameraView(
      }
    }
  
@@ -264,10 +271,16 @@ index ca796b1..f5bcfce 100644
 +    }
 +  }
 +
++  fun setHeight(height: Int?) {
++    if(height != null) {
++      pictureHeight = height
++    }
++  }
++
    override fun onFacesDetected(faces: List<Bundle>) {
      if (shouldDetectFaces) {
        emitFacesDetectedEvent(eventEmitter, this, faces)
-@@ -269,11 +300,38 @@ class ExpoCameraView(
+@@ -269,11 +307,38 @@ class ExpoCameraView(
      faceDetectorTaskLock = false
    }
  
@@ -306,7 +319,7 @@ index ca796b1..f5bcfce 100644
      addCallback(object : Callback() {
        override fun onCameraOpened(cameraView: CameraView) {
          emitCameraReadyEvent(eventEmitter, cameraView)
-@@ -320,7 +378,8 @@ class ExpoCameraView(
+@@ -320,7 +385,8 @@ class ExpoCameraView(
            val scaleX = cameraView.width.toDouble() / (dimensions.width * density)
            val scaleY = cameraView.height.toDouble() / (dimensions.height * density)
            val delegate = cameraView as FaceDetectorAsyncTaskDelegate

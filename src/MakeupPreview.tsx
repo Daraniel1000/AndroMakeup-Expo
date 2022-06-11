@@ -100,6 +100,7 @@ export default function MakeupPreview() {
                 eyeshadowColor1={eyeshadowColor1}
                 eyeshadowColor2={eyeshadowColor2}
                 eyeshadowColor3={eyeshadowColor3}
+                pictureHeight={480}
             >
                 <DefaultView style={styles.buttonContainer}>
                     <ExpandableFloatingAction
